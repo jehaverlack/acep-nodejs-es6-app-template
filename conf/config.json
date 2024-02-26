@@ -1,0 +1,16 @@
+{
+    "APP": {
+      "CONF_FILE":"",
+      "RUN_DIR":"",
+      "CONF_DIR":"",
+      "DATA_DIR": "",
+      "LOG_DIR": "",
+      "TMP_DIR": "/var/tmp"
+    },
+    "SECURITY": {
+      "RUN_AS_ADMIN": false
+    },
+    "INCLUDES": {
+      "CREDENTIALS": "credentials.json"
+    }
+}

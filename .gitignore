@@ -1,3 +1,13 @@
+# Application files
+data/*
+logs/*
+log/*
+
+# Credentials
+conf/credentials.json
+conf/credentials.txt
+conf/config.expect
+
 # Logs
 logs
 *.log
