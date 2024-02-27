@@ -24,7 +24,8 @@ npm install
 
 - Edit package.json - to update project details
 - Edit conf/config.json - to update application configuration details
-- Copy conf/credential-example.json to conf/credential.json  and `chmod 6000 conf/credential.json`
+- Copy conf/credential-example.json to conf/credential.json  and 
+```chmod 6000 conf/credential.json```
 
 
 
