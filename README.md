@@ -28,4 +28,11 @@ npm install
 ```chmod 6000 conf/credential.json```
 
 
+4.  Run the Application
+
+```
+npm start
+```
+
+
 
