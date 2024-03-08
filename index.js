@@ -17,26 +17,23 @@ applib.logger('=======================================')
 applib.logger('INFO : STARTING : ' + config.PACKAGE.title + ' : v' + config.PACKAGE.version + " : PID = " + process.pid);
 
 
-// Main Application Logic
+// ====================== Main Application Logic ======================
 
+// Query ACEP Directory
 
 // DEBUG
 console.log(JSON.stringify(config, null, 2))
 
+// ====================== End Main Application Logic ======================
 
 // Exit Handlers
+
+applib.exit_process(0); // Exit the process with a success code
+
 process.on('SIGINT', () => {
-    if (applib.release_lock(config.APP.LOCK_FILE)) {
-        process.exit(0);
-    } else {
-      process.exit(1);
-    }
+    applib.exit_process(0);
 });
 
 process.on('SIGTERM', () => {
-    if (applib.release_lock(config.APP.LOCK_FILE)) {
-        process.exit(0);
-    } else {
-        process.exit(1);
-    }
+    applib.exit_process(0);
 });

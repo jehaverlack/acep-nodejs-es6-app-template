@@ -1,8 +1,8 @@
 {
     "name": "acep-nodejs-es6-app-template",
     "title": "ACEP Node.js ES6 App Template",
-    "version": "1.0.0",
-    "version_date": "2024-02-26",
+    "version": "1.0.1",
+    "version_date": "2024-03-10",
     "description": "This template provides a baseline Node.JS ES6 Application.  Fork this repo to create a new Node.JS ES6 Application.",
     "main": "index.js",
     "type": "module",

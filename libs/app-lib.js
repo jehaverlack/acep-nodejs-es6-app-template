@@ -24,6 +24,19 @@ function logger(message) {
 
 // exports.logger = logger
 
+/**
+ * Exits the process with a given exit code. If the lock cannot be released, exits with code 1.
+ * @param {number} exitCode - The exit code to use when exiting the process.
+ */
+function exit_process(exitCode) {
+  if (release_lock(config.APP.LOCK_FILE)) {
+    process.exit(exitCode);
+  } else {
+    process.exit(1);
+  }
+};
+
+
 function running_as_admin() {
   let admin_perms = false
 
@@ -234,4 +247,4 @@ function tell_time (ts) {
 
 // exports.get_week_of_year = get_week_of_year
 
-export { logger, get_lock, release_lock, running_as_admin, tell_time, get_week_of_year };
+export { logger, exit_process, get_lock, release_lock, running_as_admin, tell_time, get_week_of_year };
