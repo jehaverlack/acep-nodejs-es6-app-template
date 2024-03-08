@@ -23,51 +23,63 @@ try {
 
 config.APP.CONF_FILE = config_file;
 config.APP.RUN_DIR = path.join(dirname, '..');
-config.PACKAGE = JSON.parse(fs.readFileSync(path.join(dirname, '..', 'package.json'), 'utf8'))
 
-// Initialize Directories
-let dirs = {
+
+// Expand Config Variables
+
+let default_dirs = {
   'CONF_DIR': "conf",
   'DATA_DIR': "data",
-  'TMP_DIR': "",
-  'LOG_DIR': "log"
+  'LOG_DIR': "log",
+  'TMP_DIR': "tmp"
 };
 
-for (let d in dirs) {
+for (let k in config.APP) {
+  if (config.APP[k] == "" && Object.keys(default_dirs).includes(k)) {
+    config.APP[k] = path.join(config.APP.RUN_DIR, default_dirs[k])
+  }
+
+  for (let kk in config.APP) {
+    config.APP[k] = config.APP[k].replace(RegExp(kk, 'g'), config.APP[kk]);
+  }
+}
+
+// Ensure Directories Exist
+for (let d in default_dirs) {
   if (!config.APP.hasOwnProperty(d) || config.APP[ d ] == "") {
-    if (dirs[d].match(RegExp('^\/'))) {
-      config.APP[ d ] = dirs[d];
-    } else {
-      config.APP[ d ] = path.join(dirname, '..', dirs[d])
+    console.log('ERROR : DIRECTORY : ' + d + ' is not defined')
+    process.exit(1);
+  }
+
+  try { // If config dir exists
+    let stats = fs.lstatSync(path.join(config.APP[ d ]));
+
+    if (!stats.isDirectory()) {
+      console.log('ERROR: ' + config.APP[ d ] + " is not a Directory.");
+      process.exit(1);
     }
-
-    try { // If config dir exists
-      let stats = fs.lstatSync(path.join(config.APP[ d ]));
-
-      if (!stats.isDirectory()) {
-        console.log('ERROR: ' + config.APP[ d ] + " is not a Directory.");
-        process.exit(1);
-      }
+  } catch (e) {
+    try {
+      fs.mkdirSync(config.APP[ d ], { recursive: true });
+      console.log('SETUP : MKDIR : ' + config.APP[ d ])
     } catch (e) {
-      try {
-        fs.mkdirSync(config.APP[ d ], { recursive: true });
-      } catch (e) {
-        console.log('ERROR:  Could not MKDIR Config Dir: ' + config.APP[ d ]);
-        console.log(e);
-        process.exit(1);
-      }
+      console.log('ERROR:  Could not MKDIR Config Dir: ' + config.APP[ d ]);
+      console.log(e);
+      process.exit(1);
     }
   }
 }
-config.APP.LOG_FILE = path.join(config.APP.LOG_DIR, config.PACKAGE.name + '.log');
-config.APP.LOCK_FILE = path.join(config.APP.TMP_DIR, config.PACKAGE.name + '.lock');
+
+
+// Load Package Information
+config.PACKAGE = JSON.parse(fs.readFileSync(path.join(dirname, '..', 'package.json'), 'utf8'))
 
 // Parse Package Dependencies from the node_modules directory respective package.json files.
 for (let dep in config.PACKAGE.dependencies) {
   let dep_file = path.join(config.APP.RUN_DIR, 'node_modules', dep, 'package.json');
   console.log("DEBUG: DEP: " + dep + ' ' + dep_file);
   try {
-    config.DEPENDENCIES[dep] = JSON.parse(fs.readFileSync(dep_file, 'utf8'));
+    config.PACKAGES[dep] = JSON.parse(fs.readFileSync(dep_file, 'utf8'));
   } catch (e) {
     console.log('ERROR: Could not read Dependency File: ' + dep_file);
     console.log(e);
@@ -76,14 +88,18 @@ for (let dep in config.PACKAGE.dependencies) {
   
 }
 
+// Load Host Information
 config.HOST = {};
 config.HOST.HOSTNAME = os.hostname();
+config.HOST.OS = os.platform();
+config.HOST.ARCH = os.arch();
 
-// config.WEB = {};
-// config.WEB.PROTO = "http://";
-// if (config.SECURITY.HTTPS) {config.WEB.PROTO = "https://";}
-// config.WEB.BASEHOST = 'localhost';
-// config.WEB.BASE_URL = config.WEB.PROTO + config.WEB.BASEHOST + ':' + config.APP.API_TCP_PORT;
+// Load Node.js Information
+config.NODE = {};
+config.NODE.VERSION = process.version;
+config.NODE.PATH = process.execPath;
+config.NODE.ARGS = process.argv;
+
 
 // Import Include Configs
 for (let inc in config.INCLUDES) {
@@ -98,6 +114,17 @@ for (let inc in config.INCLUDES) {
     }
   }
 }
+
+// Custom Config Variables
+config.APP.LOG_FILE = path.join(config.APP.LOG_DIR, config.PACKAGE.name + '.log');
+config.APP.LOCK_FILE = path.join(config.APP.TMP_DIR, config.PACKAGE.name + '.lock');
+
+// config.WEB = {};
+// config.WEB.PROTO = "http://";
+// if (config.SECURITY.HTTPS) {config.WEB.PROTO = "https://";}
+// config.WEB.BASEHOST = 'localhost';
+// config.WEB.BASE_URL = config.WEB.PROTO + config.WEB.BASEHOST + ':' + config.APP.API_TCP_PORT;
+
 
 export default config;
 
