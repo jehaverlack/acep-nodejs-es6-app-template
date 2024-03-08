@@ -23,7 +23,6 @@ try {
 
 config.APP.CONF_FILE = config_file;
 config.APP.RUN_DIR = path.join(dirname, '..');
-
 config.PACKAGE = JSON.parse(fs.readFileSync(path.join(dirname, '..', 'package.json'), 'utf8'))
 
 // Initialize Directories
@@ -62,6 +61,20 @@ for (let d in dirs) {
 }
 config.APP.LOG_FILE = path.join(config.APP.LOG_DIR, config.PACKAGE.name + '.log');
 config.APP.LOCK_FILE = path.join(config.APP.TMP_DIR, config.PACKAGE.name + '.lock');
+
+// Parse Package Dependencies from the node_modules directory respective package.json files.
+for (let dep in config.PACKAGE.dependencies) {
+  let dep_file = path.join(config.APP.RUN_DIR, 'node_modules', dep, 'package.json');
+  console.log("DEBUG: DEP: " + dep + ' ' + dep_file);
+  try {
+    config.DEPENDENCIES[dep] = JSON.parse(fs.readFileSync(dep_file, 'utf8'));
+  } catch (e) {
+    console.log('ERROR: Could not read Dependency File: ' + dep_file);
+    console.log(e);
+    exit_process(1);
+  }
+  
+}
 
 config.HOST = {};
 config.HOST.HOSTNAME = os.hostname();

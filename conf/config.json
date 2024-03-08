@@ -1,4 +1,6 @@
 {
+    "DEPENDENCIES":{},
+    "PACKAGE":{},
     "APP": {
       "CONF_FILE":"",
       "RUN_DIR":"",
